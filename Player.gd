@@ -12,7 +12,7 @@ const JUMP_VELOCITY = -400.0
 var gravity_up = 2000.
 var gravity_down = 2600.
 
-var num_jumps = 2
+var num_jumps = 1
 
 var jump_buffer = 0.0
 var cyote_time = 0.0
@@ -28,13 +28,29 @@ var is_sliding = false
 
 var campos = Vector2()
 
+var time_since_slide = 0.0
+
+var air_time = 0.0
+
+var boost_time = 0.0
+
+
+var jump_btn = "space"
 
 
 func can_destroy_glass():
 	return G.rprint((abs(parallel_vel) > SLOW_SPEED) and is_sliding)
 
 func _physics_process(delta):
+
+	if Input.is_action_just_pressed("ui_down"):
+		time_since_slide = 0.3
+	if Input.is_action_just_released("ui_down"):
+		time_since_slide = 0.0
+		print("released slide")
+	
 	is_sliding = Input.is_action_pressed("ui_down")
+
 
 
 	if jump_buffer > 0.0:
@@ -43,6 +59,10 @@ func _physics_process(delta):
 		cyote_time -= delta
 	if wall_cyote_time > 0.0:
 		wall_cyote_time -= delta
+	if time_since_slide > 0.0:
+		time_since_slide -= delta
+	if boost_time > 0.0:
+		boost_time -= delta
 
 	campos.x = lerp(campos.x, sign(velocity.x)*sqrt(abs(velocity.x))*6., 0.01)
 
@@ -54,28 +74,31 @@ func _physics_process(delta):
 	if is_on_floor():
 		$Sprite.play("run")
 		cyote_time = 0.2
-		num_jumps = 2
+		num_jumps = 1
 
 	if is_on_wall():
-		num_jumps = 2
+		num_jumps = 1
 		$Sprite.play("wall_slide")
 		wall_cyote_time = 0.2
 
 	# Add the gravity.
 	if not is_on_floor():
+		air_time += delta
 		var grav = gravity_up if velocity.y < 0 else gravity_down
 
 		if is_on_wall():
 			if Input.is_action_pressed("ui_right"):
-				grav *= 0.1 if velocity.y > 0 else 1
-		elif Input.is_action_pressed("ui_up") and velocity.y < 0.0:
+				grav *= 0.1 if velocity.y > 0 else 1.
+
+		elif Input.is_action_pressed(jump_btn) and velocity.y < 0.0:
 			grav*= 0.3
 
-		elif is_sliding:
-			grav *= 2.5
+		# elif is_sliding:
+		# 	grav *= 2.5
 		
 		velocity.y += grav * delta
 			
+
 
 
 	
@@ -83,27 +106,40 @@ func _physics_process(delta):
 	
 	# Handle jump.
 
-	if num_jumps > 0 and Input.is_action_just_pressed("ui_up"):
+	if num_jumps > 0 and Input.is_action_just_pressed(jump_btn):
 		jump_buffer = 0.1
 
-	if jump_buffer > 0.0 :
-		
-
-	
+	if jump_buffer > 0.0:
 		if cyote_time > 0.0:
-			velocity.y = JUMP_VELOCITY
+			if not is_sliding: 
+				velocity.y = JUMP_VELOCITY
+				parallel_vel = lerp(parallel_vel, FAST_SPEED*last_x_direction*1.2, 1)
+			else:
+				if boost_time > 0.0:
+					pass
+					# velocity.y = JUMP_VELOCITY*1.
+					# print("slidejump")
+					# parallel_vel = lerp(parallel_vel, SLIDE_SPEED*last_x_direction*2,1)
+				else:
+					velocity.y = JUMP_VELOCITY*0.5
+					print("failed slidejump")
+					parallel_vel = lerp(parallel_vel, SLOW_SPEED*last_x_direction, 1)
+
 			$Sprite.speed_scale = 3
 			$Sprite.play("jump")
 			$Sprite.frame = 0
+
+
 
 		elif wall_cyote_time > 0.0:			
 			$Sprite.speed_scale = 1
 			$Sprite.play("jump")
 			$Sprite.frame = 0
 
+
+
 			var wall_normal = get_wall_normal()
-		
-			print('walljump')
+
 			var lrdirection = Input.get_axis("ui_left", "ui_right")
 
 			if sign(wall_normal.x) == sign(lrdirection):
@@ -132,17 +168,29 @@ func _physics_process(delta):
 
 	if direction and not is_sliding:
 		$Sprite.flip_h = parallel_vel > 0
-		parallel_vel = move_toward(parallel_vel, direction * FAST_SPEED, 5000*delta)
+		parallel_vel = lerp(parallel_vel, direction * FAST_SPEED, 0.1)
 	else:
 		if is_sliding:
-			if is_on_floor() and get_floor_normal().y > -0.9:
-				parallel_vel = move_toward(parallel_vel, SLIDE_SPEED*last_x_direction, 10000*delta)
-			elif is_on_floor():
-				parallel_vel = move_toward(parallel_vel, SLOW_SPEED*last_x_direction, 500*delta)
-		
-			$Sprite.play("slide")
+			if not is_on_wall():
+				$Sprite.play("slide")
+			if is_on_floor():
+				if time_since_slide > 0.0 and air_time > 1. and abs(parallel_vel) > SLOW_SPEED*1.1 and boost_time <= 0.0:
+					# parallel_vel = lerp(parallel_vel, SLIDE_SPEED*last_x_direction*10, 10000*delta)
+					boost_time = 0.1
+					print("BOOOST")
+				
+				if get_floor_normal().y > -0.9:
+					parallel_vel = lerp(parallel_vel, SLIDE_SPEED*last_x_direction*0.9, 0.1)
+				else:
+					if boost_time > 0.0:
+						parallel_vel = lerp(parallel_vel, SLIDE_SPEED*last_x_direction, 1)
+					else:
+						parallel_vel = lerp(parallel_vel, SLOW_SPEED*last_x_direction, 0.1)
+			else:
+				if boost_time > 0.0:
+					parallel_vel = lerp(parallel_vel, SLIDE_SPEED*last_x_direction,0.1)
 		else:
-			parallel_vel = move_toward(parallel_vel, SLOW_SPEED*last_x_direction, 10000*delta)
+			parallel_vel = lerp(parallel_vel, SLOW_SPEED*last_x_direction,0.1)
 
 	# Update the velocity if on floor
 	if is_on_floor() and jump_buffer <= 0.0:
@@ -154,6 +202,8 @@ func _physics_process(delta):
 	else:
 		velocity.x = parallel_vel
 
+	if is_on_floor():
+		air_time = 0.0
 
 	var collision_happened = move_and_slide()
 	if collision_happened:
@@ -164,6 +214,8 @@ func _physics_process(delta):
 				b.queue_free()
 			else:
 				parallel_vel = -parallel_vel * 2
+
+
 
 
 func Pickup():
