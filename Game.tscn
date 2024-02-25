@@ -1,17 +1,25 @@
-[gd_scene load_steps=40 format=3 uid="uid://f6a4dandcl6d"]
+[gd_scene load_steps=49 format=3 uid="uid://f6a4dandcl6d"]
 
+[ext_resource type="PackedScene" uid="uid://jxn8udcnmjak" path="res://long_platform.tscn" id="1_cm8vu"]
 [ext_resource type="Script" path="res://Player.gd" id="1_gy7om"]
 [ext_resource type="Texture2D" uid="uid://ccqv7oi402cyj" path="res://icon.svg" id="1_y1s3b"]
 [ext_resource type="Texture2D" uid="uid://b01243d24icpt" path="res://jump/frame_1.PNG" id="2_5shv8"]
 [ext_resource type="Texture2D" uid="uid://bdu2d7ip2qo4m" path="res://run_animation/Paint Layer 1.PNG" id="2_w3t83"]
+[ext_resource type="PackedScene" uid="uid://bjlmjgqxhfb06" path="res://small_platform.tscn" id="3_p0cke"]
 [ext_resource type="Texture2D" uid="uid://bismmuw8dsddy" path="res://run_animation/Paint Layer 2.PNG" id="3_rrefi"]
 [ext_resource type="Texture2D" uid="uid://ci424rxshllww" path="res://run_animation/Paint Layer 3.PNG" id="4_tg5ay"]
+[ext_resource type="PackedScene" uid="uid://dm0obedgyb51v" path="res://angled_platform.tscn" id="5_lnp5g"]
 [ext_resource type="Texture2D" uid="uid://jq6j5yty85qw" path="res://run_animation/Paint Layer 4.PNG" id="5_nx4ki"]
 [ext_resource type="Texture2D" uid="uid://csgnwp5o7s7pb" path="res://run_animation/Paint Layer 5.PNG" id="6_auhk0"]
 [ext_resource type="Texture2D" uid="uid://5fwj3mdgj027" path="res://jump/frame_4.PNG" id="6_im5s6"]
+[ext_resource type="PackedScene" uid="uid://cig7yyic0v7h8" path="res://wallclimb_platform.tscn" id="6_qvaby"]
+[ext_resource type="Texture2D" uid="uid://daouculc784dj" path="res://roll/frame_1.PNG" id="6_ubsm8"]
+[ext_resource type="Texture2D" uid="uid://deq1q3yejfehw" path="res://roll/frame_2.PNG" id="7_gr6u0"]
 [ext_resource type="Texture2D" uid="uid://babvamhyar5h0" path="res://run_animation/Paint Layer 6.PNG" id="7_jq0lu"]
+[ext_resource type="Texture2D" uid="uid://ce0b6qfe5f5gm" path="res://roll/frame_3.PNG" id="8_g1vy6"]
 [ext_resource type="Texture2D" uid="uid://p53dl7k4shn3" path="res://run_animation/Paint Layer 7.PNG" id="8_i1wc6"]
 [ext_resource type="Texture2D" uid="uid://dqskqavmpofjl" path="res://run_animation/Paint Layer 8.PNG" id="9_6khjx"]
+[ext_resource type="Texture2D" uid="uid://4tlu6gu7p64" path="res://roll/frame_4.PNG" id="9_g2wh5"]
 [ext_resource type="Texture2D" uid="uid://c4t0m7qaeatct" path="res://run_animation/Paint Layer 9.PNG" id="10_10unv"]
 [ext_resource type="Texture2D" uid="uid://dj0ijmf3lsrdl" path="res://run_animation/Paint Layer 10.PNG" id="11_qqac0"]
 [ext_resource type="Texture2D" uid="uid://d22uk3ley8853" path="res://run_animation/Paint Layer 11.PNG" id="12_rjl0f"]
@@ -27,6 +35,7 @@
 [ext_resource type="PackedScene" uid="uid://dqrraeonmlyae" path="res://glass_wall.tscn" id="25_f7ah1"]
 [ext_resource type="Shader" path="res://invert.gdshader" id="26_44par"]
 [ext_resource type="Shader" path="res://blur.gdshader" id="27_8birr"]
+[ext_resource type="Script" path="res://RadialBlur.gd" id="33_b6mq5"]
 
 [sub_resource type="Environment" id="Environment_jkqt5"]
 background_mode = 3
@@ -53,6 +62,23 @@ animations = [{
 "loop": false,
 "name": &"jump",
 "speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_ubsm8")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_gr6u0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_g1vy6")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_g2wh5")
+}],
+"loop": false,
+"name": &"roll",
+"speed": 20.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -131,7 +157,7 @@ collision_use_scale = true
 size = Vector2(1522, 56)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mxd4q"]
-size = Vector2(1188, 89)
+size = Vector2(855.058, 89)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q4bmx"]
 size = Vector2(387.5, 91)
@@ -151,7 +177,7 @@ shader = ExtResource("26_44par")
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_83n4k"]
 shader = ExtResource("27_8birr")
 shader_parameter/blur_center = Vector2(0.5, 0.5)
-shader_parameter/blur_power = 0.005
+shader_parameter/blur_power = 0.01
 shader_parameter/sampling_count = 6
 
 [node name="Node2D" type="Node2D"]
@@ -159,20 +185,8 @@ shader_parameter/sampling_count = 6
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_jkqt5")
 
-[node name="Platform1" type="Sprite2D" parent="."]
-position = Vector2(1932.26, 537.454)
-scale = Vector2(-0.128, 0.071)
-texture = ExtResource("23_620q3")
-
-[node name="Platform2" type="Sprite2D" parent="."]
-position = Vector2(2750.26, 538.454)
-scale = Vector2(0.128, 0.071)
-texture = ExtResource("23_620q3")
-
-[node name="Platform5" type="Sprite2D" parent="."]
-position = Vector2(3647.26, 954.454)
-scale = Vector2(0.128, 0.071)
-texture = ExtResource("23_620q3")
+[node name="long_platform" parent="." instance=ExtResource("1_cm8vu")]
+position = Vector2(2499, 452)
 
 [node name="Platform8" type="Sprite2D" parent="."]
 position = Vector2(4230.26, 863.454)
@@ -214,39 +228,10 @@ position = Vector2(2483.26, 521.454)
 scale = Vector2(0.0832025, 0.0502355)
 texture = ExtResource("22_ljn4l")
 
-[node name="PaintLayer22" type="Sprite2D" parent="."]
-position = Vector2(4966, 920)
-rotation = 0.601272
-scale = Vector2(0.0832025, 0.0832025)
-texture = ExtResource("22_ljn4l")
-
-[node name="PaintLayer23" type="Sprite2D" parent="."]
-position = Vector2(5206, 1085)
-rotation = 0.601272
-scale = Vector2(0.0832025, 0.0832025)
-texture = ExtResource("22_ljn4l")
-
-[node name="PaintLayer24" type="Sprite2D" parent="."]
-position = Vector2(5444, 1249)
-rotation = 0.601272
-scale = Vector2(0.0832025, 0.0832025)
-texture = ExtResource("22_ljn4l")
-
-[node name="PaintLayer21" type="Sprite2D" parent="."]
-position = Vector2(2247.26, 522.454)
-scale = Vector2(0.0832025, 0.0502355)
-texture = ExtResource("22_ljn4l")
-
 [node name="Platform3" type="Sprite2D" parent="."]
 position = Vector2(1754, -136)
 rotation = -1.56774
 scale = Vector2(-0.128, 0.071)
-texture = ExtResource("23_620q3")
-
-[node name="Platform4" type="Sprite2D" parent="."]
-position = Vector2(2776, 128.454)
-rotation = -1.56774
-scale = Vector2(0.128, 0.071)
 texture = ExtResource("23_620q3")
 
 [node name="Platform7" type="Sprite2D" parent="."]
@@ -261,6 +246,7 @@ scale = Vector2(0.128, 0.071)
 texture = ExtResource("23_620q3")
 
 [node name="Player" type="CharacterBody2D" parent="." groups=["player"]]
+unique_name_in_owner = true
 position = Vector2(74, 434)
 script = ExtResource("1_gy7om")
 
@@ -273,9 +259,8 @@ shape = SubResource("CapsuleShape2D_st57m")
 position = Vector2(2, 0)
 scale = Vector2(0.03, 0.03)
 sprite_frames = SubResource("SpriteFrames_epa11")
-animation = &"wall_slide"
+animation = &"roll"
 autoplay = "run"
-speed_scale = 5.0
 
 [node name="lookpoint" type="Marker2D" parent="Player"]
 
@@ -285,8 +270,7 @@ scale = Vector2(0.1, 0.1)
 texture = ExtResource("1_y1s3b")
 
 [node name="Camera2D" type="Camera2D" parent="Player/lookpoint"]
-position = Vector2(2, 0)
-zoom = Vector2(2, 2)
+position = Vector2(2, -22)
 
 [node name="GPUParticles2D" type="GPUParticles2D" parent="Player"]
 modulate = Color(0, 0, 0, 1)
@@ -301,15 +285,6 @@ position = Vector2(238, 497)
 position = Vector2(532, 21)
 shape = SubResource("RectangleShape2D_q623v")
 
-[node name="CollisionShape2D2" type="CollisionShape2D" parent="platform"]
-position = Vector2(2111, 9)
-shape = SubResource("RectangleShape2D_mxd4q")
-
-[node name="CollisionShape2D10" type="CollisionShape2D" parent="platform"]
-position = Vector2(5119, 635)
-rotation = 0.598981
-shape = SubResource("RectangleShape2D_mxd4q")
-
 [node name="CollisionShape2D6" type="CollisionShape2D" parent="platform"]
 position = Vector2(1359, -530.546)
 shape = SubResource("RectangleShape2D_mxd4q")
@@ -317,15 +292,6 @@ shape = SubResource("RectangleShape2D_mxd4q")
 [node name="CollisionShape2D3" type="CollisionShape2D" parent="platform"]
 position = Vector2(2153, -364)
 rotation = 1.5708
-shape = SubResource("RectangleShape2D_q4bmx")
-
-[node name="CollisionShape2D4" type="CollisionShape2D" parent="platform"]
-position = Vector2(2519, -366.546)
-rotation = 1.5708
-shape = SubResource("RectangleShape2D_q4bmx")
-
-[node name="CollisionShape2D7" type="CollisionShape2D" parent="platform"]
-position = Vector2(3399.26, 439.454)
 shape = SubResource("RectangleShape2D_q4bmx")
 
 [node name="CollisionShape2D8" type="CollisionShape2D" parent="platform"]
@@ -476,7 +442,6 @@ text = "SCORE"
 position = Vector2(611, 400)
 
 [node name="CanvasLayer2" type="CanvasLayer" parent="."]
-visible = false
 
 [node name="ColorRect" type="ColorRect" parent="CanvasLayer2"]
 material = SubResource("ShaderMaterial_q6mgh")
@@ -488,13 +453,131 @@ grow_vertical = 2
 
 [node name="CanvasLayer3" type="CanvasLayer" parent="."]
 
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer3"]
+[node name="RadialBlur" type="ColorRect" parent="CanvasLayer3"]
 material = SubResource("ShaderMaterial_83n4k")
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 4.0
+offset_right = 4.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("33_b6mq5")
+
+[node name="wallclimb_platform" parent="." instance=ExtResource("6_qvaby")]
+position = Vector2(2762, 136)
+
+[node name="wallclimb_platform3" parent="." instance=ExtResource("6_qvaby")]
+position = Vector2(9510, 743)
+scale = Vector2(0.128, 0.071)
+
+[node name="small_platform" parent="." instance=ExtResource("3_p0cke")]
+position = Vector2(5186, 725)
+
+[node name="angled_platform" parent="." instance=ExtResource("5_lnp5g")]
+position = Vector2(5432, 814)
+
+[node name="angled_platform12" parent="." instance=ExtResource("5_lnp5g")]
+position = Vector2(6146, 1728)
+
+[node name="small_platform2" parent="." instance=ExtResource("3_p0cke")]
+position = Vector2(7127, 1636)
+
+[node name="long_platform2" parent="." instance=ExtResource("1_cm8vu")]
+position = Vector2(8067, 1381)
+
+[node name="angled_platform2" parent="." instance=ExtResource("5_lnp5g")]
+position = Vector2(8724, 1042)
+
+[node name="wallclimb_platform2" parent="." instance=ExtResource("6_qvaby")]
+position = Vector2(8626, 1207)
+
+[node name="angled_platform3" parent="." instance=ExtResource("5_lnp5g")]
+position = Vector2(8567, 491)
+
+[node name="long_platform3" parent="." instance=ExtResource("1_cm8vu")]
+position = Vector2(10030, 493)
+
+[node name="long_platform4" parent="." instance=ExtResource("1_cm8vu")]
+position = Vector2(11863, 495)
+
+[node name="wallclimb_platform4" parent="." instance=ExtResource("6_qvaby")]
+position = Vector2(10893, 431)
+
+[node name="small_platform3" parent="." instance=ExtResource("3_p0cke")]
+position = Vector2(12689, 1071)
+
+[node name="small_platform4" parent="." instance=ExtResource("3_p0cke")]
+position = Vector2(12703, 2189)
+
+[node name="small_platform5" parent="." instance=ExtResource("3_p0cke")]
+position = Vector2(15836, 6630)
+
+[node name="angled_platform4" parent="." instance=ExtResource("5_lnp5g")]
+position = Vector2(13358, 3075)
+
+[node name="angled_platform5" parent="." instance=ExtResource("5_lnp5g")]
+position = Vector2(14068, 3566)
+
+[node name="angled_platform6" parent="." instance=ExtResource("5_lnp5g")]
+position = Vector2(14657, 4721)
+
+[node name="long_platform5" parent="." instance=ExtResource("1_cm8vu")]
+position = Vector2(16174, 5625)
+rotation = 1.57651
+
+[node name="wallclimb_platform5" parent="." instance=ExtResource("6_qvaby")]
+position = Vector2(9510, 743)
+scale = Vector2(0.128, 0.071)
+
+[node name="small_platform7" parent="." instance=ExtResource("3_p0cke")]
+position = Vector2(7127, 1636)
+
+[node name="long_platform6" parent="." instance=ExtResource("1_cm8vu")]
+position = Vector2(8067, 1381)
+
+[node name="angled_platform7" parent="." instance=ExtResource("5_lnp5g")]
+position = Vector2(8724, 1042)
+
+[node name="wallclimb_platform6" parent="." instance=ExtResource("6_qvaby")]
+position = Vector2(6017, 1384)
+
+[node name="angled_platform8" parent="." instance=ExtResource("5_lnp5g")]
+position = Vector2(8567, 491)
+
+[node name="long_platform7" parent="." instance=ExtResource("1_cm8vu")]
+position = Vector2(10030, 493)
+
+[node name="long_platform8" parent="." instance=ExtResource("1_cm8vu")]
+position = Vector2(11863, 495)
+
+[node name="wallclimb_platform7" parent="." instance=ExtResource("6_qvaby")]
+position = Vector2(10893, 431)
+
+[node name="small_platform8" parent="." instance=ExtResource("3_p0cke")]
+position = Vector2(12689, 1071)
+
+[node name="small_platform9" parent="." instance=ExtResource("3_p0cke")]
+position = Vector2(12703, 2189)
+
+[node name="small_platform10" parent="." instance=ExtResource("3_p0cke")]
+position = Vector2(15836, 6630)
+
+[node name="angled_platform9" parent="." instance=ExtResource("5_lnp5g")]
+position = Vector2(13358, 3075)
+
+[node name="angled_platform10" parent="." instance=ExtResource("5_lnp5g")]
+position = Vector2(14068, 3566)
+
+[node name="angled_platform11" parent="." instance=ExtResource("5_lnp5g")]
+position = Vector2(14657, 4721)
+
+[node name="long_platform9" parent="." instance=ExtResource("1_cm8vu")]
+position = Vector2(16174, 5625)
+rotation = 1.57651
+
+[node name="small_platform6" parent="." instance=ExtResource("3_p0cke")]
+position = Vector2(3642, 971)
 
 [connection signal="body_entered" from="pickup" to="pickup" method="_on_body_entered"]
 [connection signal="body_entered" from="pickup2" to="pickup2" method="_on_body_entered"]

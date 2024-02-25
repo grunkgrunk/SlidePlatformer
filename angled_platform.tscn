@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3 uid="uid://dm0obedgyb51v"]
+
+[ext_resource type="Texture2D" uid="uid://dtxf6uc7n1ilm" path="res://terrain/Paint Layer 15.JPEG" id="1_ehqq1"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ua46y"]
+size = Vector2(10464, 1086.09)
+
+[node name="angled_platform" type="StaticBody2D"]
+rotation = 0.601272
+scale = Vector2(0.0832025, 0.0832025)
+
+[node name="PaintLayer23" type="Sprite2D" parent="."]
+position = Vector2(3500.46, 3.55469)
+texture = ExtResource("1_ehqq1")
+
+[node name="PaintLayer22" type="Sprite2D" parent="."]
+texture = ExtResource("1_ehqq1")
+
+[node name="PaintLayer24" type="Sprite2D" parent="."]
+position = Vector2(6974.3, 10.7949)
+texture = ExtResource("1_ehqq1")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(3466.66, -553.039)
+shape = SubResource("RectangleShape2D_ua46y")

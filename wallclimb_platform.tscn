@@ -1,0 +1,17 @@
+[gd_scene load_steps=3 format=3 uid="uid://cig7yyic0v7h8"]
+
+[ext_resource type="Texture2D" uid="uid://lvtpnp7tdu18" path="res://terrain/platform1.JPEG" id="1_6eh4k"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_d5j5f"]
+size = Vector2(3054.62, 1412.75)
+
+[node name="wallclimb_platform" type="StaticBody2D"]
+rotation = -1.56774
+scale = Vector2(0.128, 0.071)
+
+[node name="Platform4" type="Sprite2D" parent="."]
+texture = ExtResource("1_6eh4k")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-87.0845, -241.266)
+shape = SubResource("RectangleShape2D_d5j5f")

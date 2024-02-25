@@ -34,12 +34,35 @@ var air_time = 0.0
 
 var boost_time = 0.0
 
+var previous_animation = null
+
 
 var jump_btn = "space"
 
+var animation_finished = true
+
+
+func _on_animation_finished():
+	animation_finished = true
+func _on_animation_changed():
+	animation_finished = false
+	previous_animation = $Sprite.animation
 
 func can_destroy_glass():
 	return G.rprint((abs(parallel_vel) > SLOW_SPEED) and is_sliding)
+
+
+func change_animation(anim):
+	var c = $Sprite.animation
+
+	if c == 'roll' and not animation_finished and not (anim == 'jump') :
+		return
+
+	$Sprite.play(anim)
+
+func _ready():
+	$Sprite.animation_finished.connect(_on_animation_finished)
+	$Sprite.animation_changed.connect(_on_animation_changed )
 
 func _physics_process(delta):
 
@@ -67,18 +90,20 @@ func _physics_process(delta):
 	campos.x = lerp(campos.x, sign(velocity.x)*sqrt(abs(velocity.x))*6., 0.01)
 
 	$lookpoint.global_position = global_position + Vector2(campos.x, 0.0)
-	$Sprite.speed_scale = abs(velocity.x) / 100.0
-
+	if $Sprite.animation == "run":
+		$Sprite.speed_scale = abs(velocity.x) / 100.0
+	else:
+		$Sprite.speed_scale = 1
 	last_x_direction = sign(velocity.x) if velocity.x != 0. else last_x_direction
 
 	if is_on_floor():
-		$Sprite.play("run")
+		change_animation("run")
 		cyote_time = 0.2
 		num_jumps = 1
 
 	if is_on_wall():
 		num_jumps = 1
-		$Sprite.play("wall_slide")
+		change_animation("wall_slide")
 		wall_cyote_time = 0.2
 
 	# Add the gravity.
@@ -97,10 +122,8 @@ func _physics_process(delta):
 		# 	grav *= 2.5
 		
 		velocity.y += grav * delta
-			
-
-
-
+		velocity.y = clamp(velocity.y, -SLIDE_SPEED, SLIDE_SPEED)
+		
 	
 
 	
@@ -121,19 +144,19 @@ func _physics_process(delta):
 					# print("slidejump")
 					# parallel_vel = lerp(parallel_vel, SLIDE_SPEED*last_x_direction*2,1)
 				else:
-					velocity.y = JUMP_VELOCITY*0.5
+					velocity.y = JUMP_VELOCITY
 					print("failed slidejump")
-					parallel_vel = lerp(parallel_vel, SLOW_SPEED*last_x_direction, 1)
+					#parallel_vel = lerp(parallel_vel, SLOW_SPEED*last_x_direction, 1)
 
 			$Sprite.speed_scale = 3
-			$Sprite.play("jump")
+			change_animation("jump")
 			$Sprite.frame = 0
 
 
 
 		elif wall_cyote_time > 0.0:			
 			$Sprite.speed_scale = 1
-			$Sprite.play("jump")
+			change_animation("jump")
 			$Sprite.frame = 0
 
 
@@ -154,7 +177,7 @@ func _physics_process(delta):
 			jump_buffer = 0.0
 			velocity.y = JUMP_VELOCITY * 1.2
 			$Sprite.speed_scale = 3
-			$Sprite.play("jump")
+			change_animation("jump")
 			$Sprite.frame = 0
 			num_jumps -= 1
 				
@@ -169,21 +192,25 @@ func _physics_process(delta):
 		parallel_vel = lerp(parallel_vel, direction * FAST_SPEED, 0.1)
 	else:
 		if is_sliding:
-			if not is_on_wall():
-				$Sprite.play("slide")
 			if is_on_floor():
-				if time_since_slide > 0.0 and air_time > 1. and abs(parallel_vel) > SLOW_SPEED*1.1 and boost_time <= 0.0:
+				if time_since_slide > 0.0 and air_time > 0.8: #and abs(parallel_vel) > SLOW_SPEED*1.1 and boost_time <= 0.0:
 					# parallel_vel = lerp(parallel_vel, SLIDE_SPEED*last_x_direction*10, 10000*delta)
-					boost_time = 0.1
-					print("BOOOST")
-				
+					boost_time = 0.15					
+					print("rolling time")
+
 				if get_floor_normal().y > -0.9:
-					parallel_vel = lerp(parallel_vel, SLIDE_SPEED*last_x_direction*0.9, 0.1)
+					parallel_vel = lerp(parallel_vel, SLIDE_SPEED*last_x_direction, 0.1)
+					change_animation("slide")
 				else:
 					if boost_time > 0.0:
+						#if $Sprite.animation != "slide":
+						#	print("boost")
+						change_animation("roll")
 						parallel_vel = lerp(parallel_vel, SLIDE_SPEED*last_x_direction, 1)
 					else:
 						parallel_vel = lerp(parallel_vel, SLOW_SPEED*last_x_direction, 0.1)
+						change_animation("slide")
+
 			else:
 				if boost_time > 0.0:
 					parallel_vel = lerp(parallel_vel, SLIDE_SPEED*last_x_direction,0.1)
