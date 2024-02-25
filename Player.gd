@@ -28,8 +28,6 @@ var is_sliding = false
 
 var campos = Vector2()
 
-
-
 func can_destroy_glass():
 	return G.rprint((abs(parallel_vel) > SLOW_SPEED) and is_sliding)
 
@@ -123,8 +121,6 @@ func _physics_process(delta):
 			num_jumps -= 1
 				
 	
-
-	
 	
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
@@ -154,14 +150,13 @@ func _physics_process(delta):
 	else:
 		velocity.x = parallel_vel
 
-
 	var collision_happened = move_and_slide()
 	if collision_happened:
 
 		var b = get_last_slide_collision().get_collider()
 		if b.is_in_group("glass_wall"):
 			if can_destroy_glass():
-				b.queue_free()
+				b.destroy()
 			else:
 				parallel_vel = -parallel_vel * 2
 

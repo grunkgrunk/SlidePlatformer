@@ -1,0 +1,28 @@
+[gd_scene load_steps=4 format=3 uid="uid://dqrraeonmlyae"]
+
+[ext_resource type="Script" path="res://glass_wall.gd" id="1_4o72n"]
+[ext_resource type="Texture2D" uid="uid://wi8w4hs80kj1" path="res://terrain/glass.png" id="2_31jt4"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6w6o3"]
+size = Vector2(61, 181)
+
+[node name="GlassWall" type="StaticBody2D"]
+position = Vector2(600, 451)
+script = ExtResource("1_4o72n")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0.5, -0.5)
+shape = SubResource("RectangleShape2D_6w6o3")
+
+[node name="Glass" type="Sprite2D" parent="."]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("2_31jt4")
+region_enabled = true
+region_rect = Rect2(1776.81, 431.739, 691.145, 1857.16)
+
+[node name="GlassBroken" type="Sprite2D" parent="."]
+visible = false
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("2_31jt4")
+region_enabled = true
+region_rect = Rect2(2729.7, 437.453, 697.953, 1835.85)

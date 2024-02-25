@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://f6a4dandcl6d"]
+[gd_scene load_steps=40 format=3 uid="uid://f6a4dandcl6d"]
 
 [ext_resource type="Script" path="res://Player.gd" id="1_gy7om"]
 [ext_resource type="Texture2D" uid="uid://ccqv7oi402cyj" path="res://icon.svg" id="1_y1s3b"]
@@ -24,7 +24,18 @@
 [ext_resource type="Texture2D" uid="uid://dtxf6uc7n1ilm" path="res://terrain/Paint Layer 15.JPEG" id="22_ljn4l"]
 [ext_resource type="Texture2D" uid="uid://b04nfquum5i7q" path="res://terrain/Paint Layer 24.PNG" id="22_lwtuh"]
 [ext_resource type="Texture2D" uid="uid://lvtpnp7tdu18" path="res://terrain/platform1.JPEG" id="23_620q3"]
-[ext_resource type="Script" path="res://glass_wall.gd" id="25_tqp7t"]
+[ext_resource type="PackedScene" uid="uid://dqrraeonmlyae" path="res://glass_wall.tscn" id="25_f7ah1"]
+[ext_resource type="Shader" path="res://invert.gdshader" id="26_44par"]
+[ext_resource type="Shader" path="res://blur.gdshader" id="27_8birr"]
+
+[sub_resource type="Environment" id="Environment_jkqt5"]
+background_mode = 3
+glow_enabled = true
+glow_mix = 0.0
+glow_bloom = 1.0
+glow_blend_mode = 4
+glow_hdr_threshold = 1.65
+glow_hdr_scale = 2.21
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_st57m"]
 radius = 53.3333
@@ -101,6 +112,21 @@ animations = [{
 "speed": 5.0
 }]
 
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_my41h"]
+particle_flag_disable_z = true
+emission_shape = 3
+emission_box_extents = Vector3(1500, 1, 1)
+direction = Vector3(0, 1, 0)
+spread = 0.0
+initial_velocity_min = 100.0
+initial_velocity_max = 400.0
+gravity = Vector3(0, 98, 0)
+scale_min = 2.0
+scale_max = 2.0
+color = Color(1, 1, 1, 0.352941)
+collision_mode = 2
+collision_use_scale = true
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_q623v"]
 size = Vector2(1522, 56)
 
@@ -119,10 +145,19 @@ radius = 23.5372
 [sub_resource type="CircleShape2D" id="CircleShape2D_vpbmi"]
 radius = 31.0162
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_6w6o3"]
-size = Vector2(20, 435)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_q6mgh"]
+shader = ExtResource("26_44par")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_83n4k"]
+shader = ExtResource("27_8birr")
+shader_parameter/blur_center = Vector2(0.5, 0.5)
+shader_parameter/blur_power = 0.005
+shader_parameter/sampling_count = 6
 
 [node name="Node2D" type="Node2D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_jkqt5")
 
 [node name="Platform1" type="Sprite2D" parent="."]
 position = Vector2(1932.26, 537.454)
@@ -252,6 +287,12 @@ texture = ExtResource("1_y1s3b")
 [node name="Camera2D" type="Camera2D" parent="Player/lookpoint"]
 position = Vector2(2, 0)
 zoom = Vector2(2, 2)
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="Player"]
+modulate = Color(0, 0, 0, 1)
+position = Vector2(4, -168)
+amount = 100
+process_material = SubResource("ParticleProcessMaterial_my41h")
 
 [node name="platform" type="StaticBody2D" parent="."]
 position = Vector2(238, 497)
@@ -431,18 +472,29 @@ offset_bottom = 23.0
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "SCORE"
 
-[node name="GlassWall" type="StaticBody2D" parent="."]
-position = Vector2(600, 451)
-script = ExtResource("25_tqp7t")
+[node name="GlassWall" parent="." instance=ExtResource("25_f7ah1")]
+position = Vector2(611, 400)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="GlassWall"]
-position = Vector2(0, -136.5)
-shape = SubResource("RectangleShape2D_6w6o3")
+[node name="CanvasLayer2" type="CanvasLayer" parent="."]
+visible = false
 
-[node name="Icon" type="Sprite2D" parent="GlassWall"]
-position = Vector2(1.8, -1.8)
-scale = Vector2(0.128125, 0.128125)
-texture = ExtResource("1_y1s3b")
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer2"]
+material = SubResource("ShaderMaterial_q6mgh")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CanvasLayer3" type="CanvasLayer" parent="."]
+
+[node name="ColorRect" type="ColorRect" parent="CanvasLayer3"]
+material = SubResource("ShaderMaterial_83n4k")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [connection signal="body_entered" from="pickup" to="pickup" method="_on_body_entered"]
 [connection signal="body_entered" from="pickup2" to="pickup2" method="_on_body_entered"]
