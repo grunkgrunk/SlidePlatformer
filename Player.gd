@@ -159,8 +159,6 @@ func _physics_process(delta):
 			num_jumps -= 1
 				
 	
-
-	
 	
 	# Get the input direction and handle the movement/deceleration.
 	# As good practice, you should replace UI actions with custom gameplay actions.
@@ -211,7 +209,7 @@ func _physics_process(delta):
 		var b = get_last_slide_collision().get_collider()
 		if b.is_in_group("glass_wall"):
 			if can_destroy_glass():
-				b.queue_free()
+				b.destroy()
 			else:
 				parallel_vel = -parallel_vel * 2
 
